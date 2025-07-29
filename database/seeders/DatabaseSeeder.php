@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Coin;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,8 +17,18 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'samer',
+            'email' => 'samer@live.com',
+        ]);
+
+        Coin::create([
+            'name' => 'BITCOIN',
+            'code' => 'BTC',
+        ]);
+
+        Coin::create([
+            'name' => 'ETHEREUM',
+            'code' => 'ETH',
         ]);
     }
 }

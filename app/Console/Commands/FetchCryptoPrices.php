@@ -33,7 +33,7 @@ class FetchCryptoPrices extends Command
     {
         try {
             // Fetch the prices of Bitcoin and Ethereum in USD
-            $response = Http::get('https://api.coingecko.com/api/v3/simple/price', [
+            $response = Http::get(env('COINGECKO_ENDPOINT_API'), [
                 'ids' => 'bitcoin,ethereum',
                 'vs_currencies' => 'usd',
             ]);
@@ -47,7 +47,7 @@ class FetchCryptoPrices extends Command
                 CryptoData::create([
                     'coin' => strtoupper($symbol),
                     'price' => $info['usd'],
-                    'created_att' => Carbon::now()->timezone('Asia/Beirut'),
+                    // 'created_att' => Carbon::now()->timezone('Asia/Beirut'),
                 ]);
             }
 

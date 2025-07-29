@@ -21,8 +21,10 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Bitcoin Table -->
+                @foreach($coins as $coin)
+                @php($coinName = $coin->toArray()['data'][0]['coin'])
                 <div class="bg-white shadow-xl rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-4 text-yellow-500">Bitcoin (BTC) Price History</h3>
+                    <h3 class="text-xl font-bold mb-4 text-yellow-500">{{ $coinName }} ({{ $coin_codes[$coinName]}}) Price History</h3>
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-100 text-gray-700">
                             <tr>
@@ -31,45 +33,23 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            @foreach ($btcPrices as $price)
+                            @foreach ($coin->toArray()['data'] as $c)
                             <tr>
-                                <td class="px-4 py-2 text-green-600 font-medium">${{ number_format($price['price'], 2) }}</td>
-                                <td class="px-4 py-2 text-gray-600">{{ \Carbon\Carbon::parse($price['created_at'])->diffForHumans() }}</td>
+                                <td class="px-4 py-2 text-green-600 font-medium">${{ number_format($c['price'], 2) }}</td>
+                                <td class="px-4 py-2 text-gray-600">{{ \Carbon\Carbon::parse($c['created_at'])->diffForHumans() }}</td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
                     <div class="mt-4">
-                        {{ $btcPrices->appends(['eth_page' => request('eth_page')])->links() }}
+                        <!-- {{ $coin->appends(['eth_page' => request('eth_page')])->links() }} -->
                     </div>
                 </div>
-
-                <!-- Ethereum Table -->
-                <div class="bg-white shadow-xl rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-4 text-purple-600">Ethereum (ETH) Price History</h3>
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-100 text-gray-700">
-                            <tr>
-                                <th class="px-4 py-2 text-left font-semibold">Price (USD)</th>
-                                <th class="px-4 py-2 text-left font-semibold">Fetched At</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @foreach ($ethPrices as $price)
-                            <tr>
-                                <td class="px-4 py-2 text-blue-600 font-medium">${{ number_format($price['price'], 2) }}</td>
-                                <td class="px-4 py-2 text-gray-600">{{ \Carbon\Carbon::parse($price['created_at'])->diffForHumans() }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    <div class="mt-4">
-                        {{ $ethPrices->appends(['btc_page' => request('btc_page')])->links() }}
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
@@ -150,6 +130,7 @@
 
     document.addEventListener('DOMContentLoaded', initCharts);
 </script>
+    
 
 
 

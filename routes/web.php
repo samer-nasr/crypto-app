@@ -14,6 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::get('/prices', [App\Http\Controllers\CryptoPriceController::class, 'index'])->name('prices');
+    Route::get('/orders', [App\Http\Controllers\CryptoPriceController::class, 'index'])->name('orders');
 
     Route::get('/test', [
         App\Http\Controllers\CryptoDataController::class,

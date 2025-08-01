@@ -14,11 +14,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::get('/prices', [App\Http\Controllers\CryptoPriceController::class, 'index'])->name('prices');
-    Route::get('/orders', [App\Http\Controllers\CryptoPriceController::class, 'index'])->name('orders');
+    Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders');
 
     Route::get('/test', [
-        App\Http\Controllers\CryptoDataController::class,
-        'store'
+        App\Http\Controllers\CryptoPriceController::class,
+        'getChartData'
     ]);
 
     Route::get('/crypto/data', [CryptoPriceController::class, 'getChartData']);

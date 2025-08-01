@@ -9,14 +9,20 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                @foreach($coin_codes as $coin)
                 <div class="bg-white p-4 rounded-xl shadow">
+                    <h3 class="font-bold mb-2 text-yellow-500">{{ $coin }} Price Chart</h3>
+                    <canvas id="{{ $coin }}" height="150"></canvas>
+                </div>
+                @endforeach
+                <!-- <div class="bg-white p-4 rounded-xl shadow">
                     <h3 class="font-bold mb-2 text-yellow-500">BTC Price Chart</h3>
-                    <canvas id="btcChart" height="150"></canvas>
+                    <canvas id="BTC" height="150"></canvas>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow">
                     <h3 class="font-bold mb-2 text-purple-600">ETH Price Chart</h3>
-                    <canvas id="ethChart" height="150"></canvas>
-                </div>
+                    <canvas id="ETH" height="150"></canvas>
+                </div> -->
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -51,86 +57,68 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- ajax update each minute -->
     <script>
-    /**
-     * Fetches the chart data from the server.
-     *
-     * @returns {Promise<Object>}
-     */
-    async function fetchChartData() {
-        const response = await fetch('/crypto/data');
-        const data = await response.json();
+        const coins = @json($coin_codes);
+        /**
+         * Fetches the chart data from the server.
+         *
+         * @returns {Promise<Object>}
+         */
+        function fetchChartData() {
+            return $.get('/crypto/data').then(function(response) {
+                return response;
+            });
+        }
 
-        return data;
-    }
+        const chartsMap = {}; // Store chart instances here
 
-    /**
-     * Updates the chart with new data.
-     *
-     * @param {Chart} chart The chart to update.
-     * @param {Array<string>} labels The new labels.
-     * @param {Array<number>} dataset The new dataset.
-     */
-    function updateChart(chart, labels, dataset) {
-        chart.data.labels = labels;
-        chart.data.datasets[0].data = dataset;
-        chart.update();
-    }
+        function initCharts() {
+            // Fetch the initial data
+            fetchChartData().then(function(data) {
+                // Create the charts dynamically
+                $.each(coins, function(index, value) {
+                    const coinId = value.toLowerCase();
+                    const ctx = $('#' + value)[0].getContext('2d');
+                    const chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data[coinId].labels,
+                            datasets: [{
+                                label: `${value} Price (USD)`,
+                                data: data[coinId].data,
+                                borderColor: value === 'BTC' ? '#f59e0b' : '#6366f1', // optional color logic
+                                tension: 0.3,
+                                fill: false
+                            }]
+                        }
+                    });
+                    chartsMap[coinId] = chart; // Save chart reference
+                });
 
-    /**
-     * Initializes the charts.
-     */
-    async function initCharts() {
-        // Fetch the initial data
-        const data = await fetchChartData();
+                // Set interval to update all charts
+                setInterval(function() {
+                    fetchChartData().then(function(newData) {
+                        $.each(chartsMap, function(coinId, chartInstance) {
+                            updateChart(chartInstance, newData[coinId].labels, newData[coinId].data);
+                        });
+                    });
+                }, 60000);
+            });
+        }
 
-        // Create the charts
-        const btcCtx = document.getElementById('btcChart').getContext('2d');
-        const ethCtx = document.getElementById('ethChart').getContext('2d');
+        // Chart update function
+        function updateChart(chart, labels, dataset) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = dataset;
+            chart.update();
+        }
 
-        const btcChart = new Chart(btcCtx, {
-            type: 'line',
-            data: {
-                labels: data.btc.labels,
-                datasets: [{
-                    label: 'BTC Price (USD)',
-                    data: data.btc.data,
-                    borderColor: '#f59e0b',
-                    tension: 0.3,
-                    fill: false
-                }]
-            }
-        });
+        $(document).ready(initCharts);
+    </script>
 
-        const ethChart = new Chart(ethCtx, {
-            type: 'line',
-            data: {
-                labels: data.eth.labels,
-                datasets: [{
-                    label: 'ETH Price (USD)',
-                    data: data.eth.data,
-                    borderColor: '#6366f1',
-                    tension: 0.3,
-                    fill: false
-                }]
-            }
-        });
-
-        // Refresh every 60 seconds
-        setInterval(async () => {
-            const newData = await fetchChartData();
-            updateChart(btcChart, newData.btc.labels, newData.btc.data);
-            updateChart(ethChart, newData.eth.labels, newData.eth.data);
-        }, 60000);
-    }
-
-    document.addEventListener('DOMContentLoaded', initCharts);
-</script>
-    
 
 
 

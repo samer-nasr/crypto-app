@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Account;
 use App\Models\Coin;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -26,9 +27,32 @@ class DatabaseSeeder extends Seeder
             'code' => 'BTC',
         ]);
 
+          Coin::create([
+            'name' => 'DOLAR',
+            'code' => 'USD',
+        ]);
+
         Coin::create([
             'name' => 'ETHEREUM',
             'code' => 'ETH',
+        ]);
+
+        Account::create([
+            'user_id' => 1,
+            'coin_id' => 1,
+            'balance' => 1,
+        ]);
+
+        Account::create([
+            'user_id' => 1,
+            'coin_id' => 2,
+            'balance' => 1,
+        ]);
+
+        Account::create([
+            'user_id' => 1,
+            'coin_id' => 3,
+            'balance' => 100,
         ]);
     }
 }

@@ -20,11 +20,27 @@
                         {{ __('Prices') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('orders')" :active="request()->routeIs('orders')">
+                    <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders')">
                         {{ __('Orders') }}
                     </x-nav-link>
                 </div>
             </div>
+
+            <!-- amounts -->
+            <div class="flex items-center gap-3 p-2 bg-white border border-gray-200 rounded-lg shadow-sm">
+                <label for="currency" class="text-sm font-medium text-gray-700">Balance:</label>
+
+                <select id="currency" class="min-w-[90px] border-gray-300 rounded-md px-3 py-1.5 text-sm text-gray-700 focus:ring-blue-500 focus:border-blue-500 transition">
+                    @foreach ($accountBalances ?? [] as $account)
+                    <option value="{{ $account->id }}">{{ $account->coin->code }}</option>
+                    @endforeach
+                </select>
+
+                <span id="balanceAmount" class="text-sm font-semibold text-gray-800 min-w-[120px] text-right">
+                    {{ number_format($accountBalances[0]->balance ?? 0, 6) }} {{ $accountBalances[0]->coin->code ?? 'USD' }}
+                </span>
+            </div>
+
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -51,7 +67,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -97,7 +113,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
@@ -105,4 +121,18 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        const balances = @json($accountBalances->pluck('balance', 'coin_id')->toArray());
+        const coins_codes = @json($accountBalances->pluck('coin.code', 'coin_id')->toArray());
+
+        $('#currency').on('change', function() {
+            const coin = $(this).val();
+            // alert(coin);
+            const amount = balances[coin] ?? 0;
+            const formatted = `${parseFloat(amount).toFixed(6)} ${coins_codes[coin]}`;
+            $('#balanceAmount').text(formatted);
+        });
+    </script>
 </nav>

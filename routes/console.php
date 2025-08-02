@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 app(Schedule::class)->command('crypto:fetch')->everyMinute();
+app(Schedule::class)->command('orders:execute')->everyMinute();

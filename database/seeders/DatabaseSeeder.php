@@ -40,19 +40,19 @@ class DatabaseSeeder extends Seeder
         Account::create([
             'user_id' => 1,
             'coin_id' => 1,
-            'balance' => 1,
+            'balance' => 0,
         ]);
 
         Account::create([
             'user_id' => 1,
             'coin_id' => 2,
-            'balance' => 1,
+            'balance' => 100,
         ]);
 
         Account::create([
             'user_id' => 1,
             'coin_id' => 3,
-            'balance' => 100,
+            'balance' => 0,
         ]);
     }
 }

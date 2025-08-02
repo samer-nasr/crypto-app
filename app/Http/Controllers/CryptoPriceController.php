@@ -28,7 +28,7 @@ class CryptoPriceController extends Controller
 
     public function getChartData(Request $request)
     {
-        $mysql_coins = Coin::all();
+        $mysql_coins = Coin::where('code', '!=', 'USD')->get();
         
         $coins = [];
 

@@ -11,22 +11,24 @@
             {{-- Section 1: Make Order --}}
             <div class="bg-white p-6 rounded-xl shadow-md">
                 <h3 class="text-lg font-semibold mb-4 text-blue-700">Place Order</h3>
-                <form id="orderForm" method="POST" action="">
+                <form id="orderForm" method="POST" action="{{ route('orders.store') }}">
                     @csrf
 
                     <div class="mb-4">
                         <label class="block font-medium text-gray-700">Order Type</label>
                         <select name="type" id="orderType" class="w-full border-gray-300 rounded-lg mt-1">
-                            <option value="buy">Buy</option>
-                            <option value="sell">Sell</option>
+                            <option value="Buy">Buy</option>
+                            <option value="Sell">Sell</option>
                         </select>
                     </div>
 
                     <div class="mb-4">
                         <label class="block font-medium text-gray-700">Select Coin</label>
                         <select name="coin" id="coin" class="w-full border-gray-300 rounded-lg mt-1">
-                            <option value="BTC">Bitcoin (BTC)</option>
-                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="">Select Coin</option>
+                            @foreach ($coins as $coin)
+                            <option value="{{ $coin->id }}">{{ $coin->name }} ({{ $coin->code }})</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -37,12 +39,12 @@
 
                     <div class="mb-4">
                         <label class="block font-medium text-gray-700">Amount</label>
-                        <input type="number" step="0.0001" name="amount" id="amount" class="w-full border-gray-300 rounded-lg mt-1" required>
+                        <input type="number" step="0.0001" name="quantity" id="amount" class="w-full border-gray-300 rounded-lg mt-1" required>
                     </div>
 
                     <div class="mb-4">
                         <label class="block font-medium text-gray-700">Total</label>
-                        <input type="text" id="total" class="w-full border-gray-200 bg-gray-100 rounded-lg mt-1" readonly>
+                        <input type="text" id="total" name="counter_price" class="w-full border-gray-200 bg-gray-100 rounded-lg mt-1" readonly>
                     </div>
 
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
@@ -96,7 +98,7 @@
             function updateTotal() {
                 const price = parseFloat($('#price').val());
                 const amount = parseFloat($('#amount').val());
-                const total = (price * amount).toFixed(2);
+                const total = (price * amount).toFixed(6);
                 $('#total').val(isNaN(total) ? '' : total);
             }
             $('#price, #amount').on('input', updateTotal);

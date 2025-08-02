@@ -7,7 +7,6 @@
 
     <div class="py-12 bg-gray-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 @foreach($coin_codes as $coin)
                 <div class="bg-white p-4 rounded-xl shadow">

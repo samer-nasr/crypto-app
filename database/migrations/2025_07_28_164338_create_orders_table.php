@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('coin_id');
+            $table->unsignedBigInteger('counter_coin_id')->default(2);
             $table->float('price');
+            $table->float('counter_price');
             $table->string('status');
+            $table->string('type');
             $table->float('quantity');
             $table->boolean('is_deleted')->default(false);
             $table->timestamps();

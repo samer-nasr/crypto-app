@@ -32,7 +32,7 @@
 
                 <select id="currency" class="min-w-[90px] border-gray-300 rounded-md px-3 py-1.5 text-sm text-gray-700 focus:ring-blue-500 focus:border-blue-500 transition">
                     @foreach ($accountBalances ?? [] as $account)
-                    <option value="{{ $account->id }}">{{ $account->coin->code }}</option>
+                    <option value="{{ $account->id }}">{{ $account->coin->code }} </option>
                     @endforeach
                 </select>
 

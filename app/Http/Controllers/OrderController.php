@@ -13,7 +13,9 @@ class OrderController extends Controller
     {
         $coins = Coin::where('code', '!=', 'USD')->get();
 
-        return view('crypto.orders.index' , compact('coins'));
+        $orders = Order::with('coin')->where('is_deleted', 0)->get();
+
+        return view('crypto.orders.index' , compact('coins', 'orders'));
     }
 
     public function store(Request $request)

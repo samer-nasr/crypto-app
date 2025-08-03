@@ -54,8 +54,8 @@ class ExecuteOrders extends Command
             $account            = $o->user->accounts->where('coin_id', $o->coin_id)->first();
             $counter_account    = $o->user->accounts->where('coin_id', $o->counter_coin_id)->first();
             $log['old'] = [
-                'account' => $account->balance,
-                'counter_account' => $counter_account->balance
+                'account' => $account->toArray(),
+                'counter_account' => $counter_account->toArray()
             ];
             if ($type == 'Buy') {
                 if ($latest_prices[$o->coin->code] <= $o->price) {
@@ -69,8 +69,8 @@ class ExecuteOrders extends Command
                     $counter_account->save();
 
                     $log['new'] = [
-                        'account' => $account->balance,
-                        'counter_account' => $counter_account->balance
+                        'account' => $account->toArray(),
+                        'counter_account' => $counter_account->toArray()
                     ];
                 }
             } else {
@@ -85,11 +85,12 @@ class ExecuteOrders extends Command
                     $counter_account->save();
 
                     $log['new'] = [
-                        'account' => $account->balance,
-                        'counter_account' => $counter_account->balance
+                        'account' => $account->toArray(),
+                        'counter_account' => $counter_account->toArray()
                     ];
                 }
             }
+
             if (isset($log['old']) && isset($log['new'])) {
                 MongoLog::create([
                     'event' => 'order_success',

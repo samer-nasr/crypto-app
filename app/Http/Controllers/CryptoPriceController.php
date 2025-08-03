@@ -53,4 +53,42 @@ class CryptoPriceController extends Controller
 
         return response()->json($response_array);
     }
+
+    public function test()
+    {
+        $mongo_data_btc = CryptoData::where('coin', 'BITCOIN')
+                                    ->where('created_at', '>=', Carbon::now()->subDays(1))
+                                    ->get();
+        $first_date = '';
+        $i = 0;
+
+        foreach ($mongo_data_btc as $d) {
+            if($i == 0) dump($d->created_at->format('Y-m-d H:i'));
+            $i++;
+            if($i-1  == 4) $i =0;
+        }
+
+        dd('stop');
+
+        foreach ($mongo_data_btc as $d) {
+            // dump($d->created_at->format('Y-m-d H:i'));
+            if(empty($first_date)) {
+                $first_date = $d->created_at;
+                dump($d->created_at->format('Y-m-d H:i').' first => '. $d->price);
+                $i++;
+                continue;
+            }
+            if(Carbon::parse($d->created_at)->format('Y-m-d H:i') == Carbon::parse($first_date)->addMinutes(5)->format('Y-m-d H:i') || $i == 5) {
+                // dd('here');
+                dump($d->created_at.' => '. $d->price.' '.$i);
+                $first_date = $d->created_at;
+                // dump('ttt: '.$first_date->format('Y-m-d H:i'));
+                $i++;
+                if($i-1  == 5) $i =0;
+            }
+        }
+        dd('stop');
+        $mongo_data_eth = CryptoData::where('coin', 'ETHEREUM')->get();
+        dd($mongo_data_btc->toArray() , $mongo_data_eth->toArray());
+    }
 }

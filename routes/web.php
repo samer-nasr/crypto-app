@@ -19,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/test', [
         App\Http\Controllers\CryptoPriceController::class,
-        'getChartData'
+        'test'
     ]);
 
     Route::get('/crypto/data', [CryptoPriceController::class, 'getChartData']);

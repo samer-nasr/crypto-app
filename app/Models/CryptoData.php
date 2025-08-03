@@ -10,6 +10,6 @@ class CryptoData extends Model
     protected $collection = 'crypto_prices'; // Optional: name of MongoDB collection
 
     protected $fillable = [
-        'coin', 'price', 'created_att'
+        'coin', 'price', 'label'
     ];
 }

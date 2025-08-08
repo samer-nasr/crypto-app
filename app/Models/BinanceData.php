@@ -17,5 +17,12 @@ class BinanceData extends Model
         'close_price',
         'volume',
         'close_time',
+        'symbol',
+        'label',
+        'avg_price',
+        'price_range',
+        'percentage_change',
+        'previous_avg_price',
+        'previous_price_change',
     ];
 }

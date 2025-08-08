@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\BinanceData;
 use App\Models\Coin;
 use App\Models\CryptoData;
 use Carbon\Carbon;
@@ -29,24 +30,23 @@ class LabelCryptoData extends Command
      */
     public function handle()
     {
-        $coins = Coin::where('code', '!=', 'USD')->get();
-        $threshold = 0.0025; // 0.25%
-        $lookAheadMinutes = 30;
+        $symbols = ['BTCUSDT','ETHUSDT'];
+        $threshold = 0.0050; // 0.5%
+        $lookAheadDays = 10;
         
+        foreach ($symbols as $symbol) {
+            $symbol_prices = BinanceData::where('symbol', $symbol)->get();
 
-        foreach ($coins as $c) {
-            $btc_prices = CryptoData::where('coin', $c->name)->get();
-
-            foreach ($btc_prices as $p) {
-                $btc_price = $p->price;
-                $nextPrice = $btc_prices->where('created_at', '>', $p->created_at)
-                    ->where('created_at', '<=', Carbon::parse($p->created_at)->addMinutes($lookAheadMinutes))
+            foreach ($symbol_prices as $p) {
+                $symbol_price = $p->avg_price;
+                $nextPrice = $symbol_prices->where('open_time', '>', $p->open_time)
+                    ->where('open_time', '<=', Carbon::parse($p->open_time)->addDays($lookAheadDays))
                     ->last();
 
                 if (!$nextPrice) {
                     continue;
                 }
-                $change = ($nextPrice->price - $btc_price) / $btc_price;
+                $change = ($nextPrice->avg_price - $symbol_price) / $symbol_price;
 
                 if ($change >= $threshold) {
                     $p->label = 1;

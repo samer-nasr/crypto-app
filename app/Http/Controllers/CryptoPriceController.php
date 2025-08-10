@@ -34,11 +34,13 @@ class CryptoPriceController extends Controller
 
         foreach($mysql_coins as $c) {
              $coin = CryptoData::where('coin', strtoupper($c->name))
-            ->latest()
+            // ->latest()
+            ->orderBy('open_time', 'desc')
             ->take(15)
             ->get()
             ->reverse()
             ->values();
+            // dd($coin->toArray());
 
             $coins[$c->code] = $coin;
         }
@@ -46,7 +48,8 @@ class CryptoPriceController extends Controller
         $response_array = [];
         foreach($coins as $k => $v) {
             $response_array[strtolower($k)] = [
-                'labels' => $v->pluck('created_at')->map(fn($d) => Carbon::parse($d)->setTimezone('Asia/Beirut')->format('H:i')),
+                // 'labels' => $v->pluck('created_at')->map(fn($d) => Carbon::parse($d)->setTimezone('Asia/Beirut')->format('m-d')),
+                'labels' => $v->pluck('open_time')->map(fn($d) => Carbon::parse($d)->format('m-d')),
                 'data' => $v->pluck('price'),
             ];
         }

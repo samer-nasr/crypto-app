@@ -32,7 +32,10 @@ class CreateDataFeatures extends Command
             $records = BinanceData::where('symbol', $symbol)->get();
             try {
                 for ($i = 1; $i < $records->count(); $i++) {
+                    
                     $record = $records[$i];
+                    // if data is filled skip
+                    if($record->avg_price) continue;
                     $previous_record = $records[$i - 1];
                     // dd($record->toArray() , $previous_record->toArray());
 

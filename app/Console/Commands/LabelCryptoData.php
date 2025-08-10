@@ -37,26 +37,33 @@ class LabelCryptoData extends Command
         foreach ($symbols as $symbol) {
             $symbol_prices = BinanceData::where('symbol', $symbol)->get();
 
-            foreach ($symbol_prices as $p) {
-                $symbol_price = $p->avg_price;
-                $nextPrice = $symbol_prices->where('open_time', '>', $p->open_time)
-                    ->where('open_time', '<=', Carbon::parse($p->open_time)->addDays($lookAheadDays))
-                    ->last();
+            for($i = 0; $i < $symbol_prices->count(); $i++) {
+                // reset all labels
+                // $symbol_prices[$i]->label = Null;
+                // $symbol_prices[$i]->save();
+                // echo $symbol_prices[$i]->label . ' ' . $i . '\n';
+                // continue;
 
-                if (!$nextPrice) {
-                    continue;
-                }
-                $change = ($nextPrice->avg_price - $symbol_price) / $symbol_price;
+                // label against next 10 days
+                $symbol_record = $symbol_prices[$i];
+                $symbol_price = $symbol_record->avg_price;
+                if($i + $lookAheadDays >= $symbol_prices->count()) continue;
+                // get the next 10 days price
+                $next10DaysPrice = $symbol_prices[$i + $lookAheadDays]->avg_price;
+
+                $change = ($next10DaysPrice - $symbol_price) / $symbol_price;
 
                 if ($change >= $threshold) {
-                    $p->label = 1;
+                    $symbol_record->label = 1;
                 } else if ($change <= -$threshold) {
-                    $p->label = -1;
+                    $symbol_record->label = -1;
                 } else {
-                    $p->label = 0;
+                    $symbol_record->label = 0;
                 }
-                echo $p->label;
-                $p->save();
+                echo $symbol_record->label.' ' . $i . '\n';
+                $symbol_record->save();
+
+                // dump($next10DaysPrice);
             }
         }
     }

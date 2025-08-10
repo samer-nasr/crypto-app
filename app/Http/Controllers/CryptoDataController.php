@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BinanceData;
+use App\Models\CryptoData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class CryptoDataController extends Controller
 {
@@ -13,6 +16,29 @@ class CryptoDataController extends Controller
     public function index()
     {
         //
+    }
+
+    public function update_crypto_data()
+    {
+        $last_crypto_data = CryptoData::orderBy('created_at', 'desc')->first();
+        $symbols = ['BTCUSDT', 'ETHUSDT'];
+
+        foreach ($symbols as $symbol) 
+        {
+            $binance_data = BinanceData::where('symbol', $symbol)
+                                        ->orderBy('open_time', 'asc')
+                                        ->whereNotNull('avg_price')
+                                        ->get();
+            foreach ($binance_data as $data) {
+                CryptoData::create([
+                    'coin' => $symbol == 'BTCUSDT' ? 'BITCOIN' : 'ETHEREUM',
+                    'price' => $data->avg_price,
+                    'open_time' => $data->open_time
+                ]);
+            }
+        }
+      
+        dd("done");
     }
 
     /**
@@ -52,7 +78,7 @@ class CryptoDataController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        dd('here');
     }
 
     /**

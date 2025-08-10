@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\CryptoDataController;
 use App\Http\Controllers\CryptoPriceController;
+use App\Http\Controllers\ModelTrainController;
+use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,10 +20,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders');
     Route::resource('/orders', App\Http\Controllers\OrderController::class);
 
-    Route::get('/test', [
-        App\Http\Controllers\CryptoPriceController::class,
-        'test'
+    Route::get('/update_crypto_data', [
+        CryptoDataController::class, 'update_crypto_data'
     ]);
+
+    Route::get('/predict' , [PredictionController::class, 'predict']);
+    Route::get('/train' , [ModelTrainController::class, 'train']);
 
     Route::get('/crypto/data', [CryptoPriceController::class, 'getChartData']);
 

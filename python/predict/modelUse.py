@@ -2,11 +2,11 @@ import joblib
 import pandas as pd
 
 # Load the model
-model = joblib.load("../model/model1.pkl")
+model = joblib.load("../model/xgb_model.pkl")
 
 # Example new data
 new_data = pd.DataFrame([{
-   "avg_price": 114548.2875,
+  "avg_price": 114548.2875,
   "percentage_change": 0.007557363439418767,
   "previous_avg_price": 114240.64749999999,
   "previous_price_change": -0.008042064740672344,

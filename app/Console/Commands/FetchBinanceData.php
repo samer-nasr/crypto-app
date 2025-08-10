@@ -93,6 +93,7 @@ class FetchBinanceData extends Command
 
             // dd($allData);
             foreach ($allData as $info) {
+                // create binance data
                 BinanceData::create([
                     'open_time' =>  Carbon::createFromTimestamp($info['open_time'] / 1000)->toDateTimeString(),
                     'open_price' => $info['open_price'],
@@ -102,6 +103,13 @@ class FetchBinanceData extends Command
                     'volume' => $info['volume'],
                     'close_time' => Carbon::createFromTimestamp($info['close_time'] / 1000)->toDateTimeString(),
                     'symbol' => $info['symbol']
+                ]);
+
+                // create crypto data
+                CryptoData::create([
+                    'coin' => $info['symbol'] == 'BTCUSDT' ? 'BITCOIN' : 'ETHEREUM',
+                    'price' => ($info['close_price'] + $info['open_price'] + $info['high_price'] + $info['low_price']) / 4,
+                    'open_time' => Carbon::createFromTimestamp($info['open_time'] / 1000)->toDateTimeString()
                 ]);
             }
 

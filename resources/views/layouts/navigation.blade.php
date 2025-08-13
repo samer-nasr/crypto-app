@@ -23,6 +23,10 @@
                     <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders')">
                         {{ __('Orders') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('models.index')" :active="request()->routeIs('models')">
+                        {{ __('Models') }}
+                    </x-nav-link>
                 </div>
             </div>
 

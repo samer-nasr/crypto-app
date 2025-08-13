@@ -41,7 +41,7 @@
                             @foreach ($coin->toArray()['data'] as $c)
                             <tr>
                                 <td class="px-4 py-2 text-green-600 font-medium">${{ number_format($c['price'], 2) }}</td>
-                                <td class="px-4 py-2 text-gray-600">{{ \Carbon\Carbon::parse($c['created_at'])->diffForHumans() }}</td>
+                                <td class="px-4 py-2 text-gray-600">{{ \Carbon\Carbon::parse($c['open_time'])->diffForHumans() }}</td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -13,7 +13,11 @@ class ModelTrain extends Model
         'symbol',
         'records',
         'model_name',
+        'model_path',
         'classification_report',
         'confusion_matrix',
+        'last_record_time',
+        'label_days',
+        'is_deleted'
     ];
 }

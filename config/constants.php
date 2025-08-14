@@ -13,4 +13,6 @@ return [
         '10 days'=> 10
     ],
 
+    'models_path' => 'python/model/',
+
 ];

@@ -5,6 +5,7 @@ use App\Http\Controllers\CryptoPriceController;
 use App\Http\Controllers\ModelTrainController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\ProfileController;
+use App\Jobs\LabelDataJob;
 use App\Models\Symbol;
 use Illuminate\Support\Facades\Route;
 
@@ -26,15 +27,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         CryptoDataController::class, 'update_crypto_data'
     ]);
 
-    Route::get('/predict' , [PredictionController::class, 'predict']);
+    Route::post('/predict' , [PredictionController::class, 'predict'])->name('predict');
     Route::get('/train' , [ModelTrainController::class, 'train']);
 
     Route::get('/test' , [PredictionController::class, 'test_prediction']);
 
      Route::get('/config' , function () {
-        
-
-        
+        LabelDataJob::dispatch();
      });
 
 

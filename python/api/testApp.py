@@ -63,7 +63,7 @@ def predict(data: PredictionInput , model_path: str):
 
 
 @app.post("/train")
-def train(data: TrainingData , symbol: str):
+def train(data: TrainingData , symbol: str , test: bool):
     global model
 
     # Convert incoming JSON to DataFrame
@@ -77,7 +77,13 @@ def train(data: TrainingData , symbol: str):
 
     # Train model
     model = RandomForestClassifier(n_estimators=100, random_state=42)
-    model.fit(X_train, y_train)
+
+    if test:
+        model.fit(X_train, y_train)
+    else:
+        model.fit(X, y)
+        
+    # model.fit(X_train, y_train)
 
     # Evaluation
     y_pred = model.predict(X_test)

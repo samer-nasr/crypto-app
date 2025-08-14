@@ -19,7 +19,7 @@ class CryptoPriceController extends Controller
         foreach ($mysql_coins as $c) {
             $coin = CryptoData::where('coin', strtoupper($c->name))
                 ->orderBy('open_time', 'desc')
-                ->paginate(10, ['*'], $c->code);
+                ->paginate(15, ['*'], $c->code);
             $coins[$c->code] = $coin;
         }
 

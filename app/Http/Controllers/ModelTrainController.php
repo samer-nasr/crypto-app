@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BinanceData;
 use App\Models\ModelTrain;
 use App\Models\Symbol;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -12,33 +13,53 @@ class ModelTrainController extends Controller
 {
     public function train(Request $request)
     {
+        $is_test    = 1;
         $symbol     = $request->symbol;
         $label_time = $request->label_time;
-        $last_date  = $request->last_date;
+        $label      = 'label_' . $label_time;
+        $last_date  = Carbon::parse($request->last_date)->format('Y-m-d H:i:s');
+        // dd($last_date);
 
         $query = BinanceData::where('symbol', $symbol)
             ->whereNotNull('percentage_change')
-            ->whereNotNull('label');
-            // ->where('label_time' , $label_time)
+            // ->whereNotNull('label')
+            ->whereNotNull($label);
+
 
         if ($last_date) {
             $query = $query->where('open_time', '<=', $last_date);
         }
 
-        $records = $query->get([
-                    'avg_price',
-                    'percentage_change',
-                    'previous_avg_price',
-                    'previous_price_change',
-                    'price_range',
-                    'label',
-                    'open_time'
-                ])->toArray();
+        $query = $query->select(
+            'avg_price',
+            'percentage_change',
+            'previous_avg_price',
+            'previous_price_change',
+            'price_range',
+            $label,
+            'open_time'
+        );
 
-        // dd($query);
+        $records = $query->get(
+            // [
+            //     'avg_price',
+            //     'percentage_change',
+            //     'previous_avg_price',
+            //     'previous_price_change',
+            //     'price_range',
+            //      $label,
+            //     'open_time'
+            // ]
+        )->map(function ($item) use ($label) {
+            $item->label = $item[$label] ?? null;
+            unset($item[$label]);
+            return $item;
+        })->toArray();
+
+        // dd($records);
         $last_record_time = $query->orderBy('open_time', 'desc')
-                                ->first()
-                                ->open_time;
+            ->first()
+            ->open_time;
 
         $records = array_map(function ($record) {
             unset($record['id']);
@@ -48,7 +69,8 @@ class ModelTrainController extends Controller
 
         // dd($last_record_time,$records);
 
-        $endpoint = 'http://127.0.0.1:8001/train?symbol=' . $symbol . '';
+        $endpoint = 'http://127.0.0.1:8001/train?symbol=' . $symbol . '&test=' . $is_test . '';
+        // dd($endpoint);
         $response = Http::post($endpoint, [
             "records" => $records,
         ]);
@@ -69,62 +91,16 @@ class ModelTrainController extends Controller
         $modelTrain->model_name             = $response["model_name"];
         $modelTrain->classification_report  = $response["classification_report"];
         $modelTrain->confusion_matrix       = $response["confusion_matrix"];
+        $modelTrain->is_test                = $is_test;
 
         $modelTrain->save();
 
         return $modelTrain;
-
-        
-
-
-        // $symbols = ['BTCUSDT', 'ETHUSDT'];
-
-        // foreach ($symbols as $symbol) 
-        // {
-        //     $records = BinanceData::where('symbol', $symbol)
-        //         // ->where('open_time', '<=', '2025-07-30 00:00:00')
-        //         ->whereNotNull('percentage_change')
-        //         ->whereNotNull('label')
-        //         // ->orderBy('open_time', 'desc')
-        //         ->get([
-        //             'avg_price',
-        //             'percentage_change',
-        //             'previous_avg_price',
-        //             'previous_price_change',
-        //             'price_range',
-        //             'label',
-        //             // 'open_time',
-        //         ])->toArray();
-        //     // dd($records);
-
-        //     $last_record_time = $records[count($records) - 1]['open_time'];
-
-        //     $endpoint = 'http://127.0.0.1:8001/train?symbol=' . $symbol . '';
-        //     $response = Http::post($endpoint, [
-        //         "records" => $records,
-        //     ]);
-
-        //     $response = $response->json();
-
-        //     // save training in mongo
-        //     $modelTrain                         = new ModelTrain();
-
-        //     $modelTrain->symbol                 = $symbol;
-        //     $modelTrain->records                = $response["records_used"];
-        //     $modelTrain->last_record_time       = $last_record_time;
-        //     $modelTrain->model_name             = $response["model_name"];
-        //     $modelTrain->classification_report  = $response["classification_report"];
-        //     $modelTrain->confusion_matrix       = $response["confusion_matrix"];
-
-        //     $modelTrain->save();
-
-        //     // dd($modelTrain);
-        // }
     }
 
     public function index(Request $request)
     {
-        $models = ModelTrain::all();
+        $models = ModelTrain::where('is_deleted', 0)->get();
         $symbols = Symbol::where('is_deleted', 0)->get();
 
         $label_times = config('constants.label_time');
@@ -138,6 +114,27 @@ class ModelTrainController extends Controller
         // dd($request->all());
         $response = $this->train($request);
 
-        dd($response);
+        return redirect()->route('models.index')->with('success', 'Model created successfully.');
+    }
+
+    public function destroy($id)
+    {
+
+        // $model = ModelTrain::where('id', $id)->first();
+        $model = ModelTrain::find($id);
+
+        $model->is_deleted = 1;
+        $model->save();
+
+        // delete model file
+
+        $model_path = config('constants.models_path') . $model->symbol . '/' . $model->model_name;
+        $model_path = base_path($model_path);
+
+        if (file_exists($model_path)) {
+            unlink($model_path);
+        }
+
+        return redirect()->route('models.index')->with('success', 'Model deleted successfully.');
     }
 }

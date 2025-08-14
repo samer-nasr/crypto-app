@@ -18,6 +18,7 @@ class ModelTrain extends Model
         'confusion_matrix',
         'last_record_time',
         'label_days',
-        'is_deleted'
+        'is_deleted',
+        'is_test'
     ];
 }

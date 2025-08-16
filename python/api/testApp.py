@@ -60,10 +60,8 @@ def predict(data: PredictionInput , model_path: str):
 
     prediction = model.predict(features)[0]
     return {"prediction": float(prediction)}
-
-
 @app.post("/train")
-def train(data: TrainingData , symbol: str , test: bool):
+def train(data: TrainingData, symbol: str, test: bool):
     global model
 
     # Convert incoming JSON to DataFrame
@@ -73,26 +71,26 @@ def train(data: TrainingData , symbol: str , test: bool):
     X = df.drop(columns=["label"])
     y = df["label"]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Chronological split (first 80% train, last 20% test)
+    train_size = int(len(df) * 0.8)
+    X_train, X_test = X[:train_size], X[train_size:]
+    y_train, y_test = y[:train_size], y[train_size:]
 
     # Train model
     model = RandomForestClassifier(n_estimators=100, random_state=42)
 
     if test:
+        # Only train on first 80%
         model.fit(X_train, y_train)
     else:
+        # Train on full dataset
         model.fit(X, y)
-        
-    # model.fit(X_train, y_train)
 
-    # Evaluation
+    # Evaluation (always on last 20% to simulate "future")
     y_pred = model.predict(X_test)
-    # Convert classification report to dict
     classification_report_result = classification_report(
         y_test, y_pred, output_dict=True
     )
-
-    # Convert confusion matrix to list for JSON serialization
     confusion_matrix_result = confusion_matrix(y_test, y_pred).tolist()
 
     # Save model
@@ -105,12 +103,63 @@ def train(data: TrainingData , symbol: str , test: bool):
     joblib.dump(model, NEW_MODEL_PATH)
 
     return {
-        "message": "Model trained successfully", 
-        "records_used": len(df), 
-        "model_name" :f"xgb_model_{timestamp}.pkl",
+        "message": "Model trained successfully",
+        "records_used": len(df),
+        "model_name": f"xgb_model_{timestamp}.pkl",
         "classification_report": classification_report_result,
         "confusion_matrix": confusion_matrix_result
-        }
+    }
+
+
+# @app.post("/train")
+# def train(data: TrainingData , symbol: str , test: bool):
+#     global model
+
+#     # Convert incoming JSON to DataFrame
+#     df = pd.DataFrame([record.dict() for record in data.records])
+
+#     # Separate features and target
+#     X = df.drop(columns=["label"])
+#     y = df["label"]
+
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#     # Train model
+#     model = RandomForestClassifier(n_estimators=100, random_state=42)
+
+#     if test:
+#         model.fit(X_train, y_train)
+#     else:
+#         model.fit(X, y)
+        
+#     # model.fit(X_train, y_train)
+
+#     # Evaluation
+#     y_pred = model.predict(X_test)
+#     # Convert classification report to dict
+#     classification_report_result = classification_report(
+#         y_test, y_pred, output_dict=True
+#     )
+
+#     # Convert confusion matrix to list for JSON serialization
+#     confusion_matrix_result = confusion_matrix(y_test, y_pred).tolist()
+
+#     # Save model
+#     MODEL_DIR = os.path.join("../model", symbol)
+#     os.makedirs(MODEL_DIR, exist_ok=True)
+
+#     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+#     NEW_MODEL_PATH = os.path.join(MODEL_DIR, f"xgb_model_{timestamp}.pkl")
+
+#     joblib.dump(model, NEW_MODEL_PATH)
+
+#     return {
+#         "message": "Model trained successfully", 
+#         "records_used": len(df), 
+#         "model_name" :f"xgb_model_{timestamp}.pkl",
+#         "classification_report": classification_report_result,
+#         "confusion_matrix": confusion_matrix_result
+#         }
 
 
 if __name__ == "__main__":

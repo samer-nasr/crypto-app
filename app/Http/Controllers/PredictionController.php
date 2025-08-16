@@ -32,11 +32,14 @@ class PredictionController extends Controller
                         ->toArray();
         unset($data['id']);
 
+        // dd($data);
+
         $endpoint = 'http://127.0.0.1:8001/predict?model_path=' . $model_path . '';
 
         $response = Http::post($endpoint, $data);
 
         $return = $response->json()['prediction'];
+        // dd($return);
 
         if($return == 1) 
         {
@@ -52,13 +55,17 @@ class PredictionController extends Controller
         }
 
         return $return;
-        return $response->json()['prediction'];
-
-        dd($response->json() , $data);
     }
 
     public function test_prediction()
     {
+        $request                = new Request();
+        $request['date']        = '2025-08-03 00:00:00';
+        $request['symbol']      = 'ETHUSDT';
+        $model_id = ModelTrain::where('symbol', $request->symbol)->where('is_deleted', 0)->latest()->first()->id;
+        $request['model_id']    = $model_id;
+        dd($this->predict($request));
+
         $symbol         = 'ETHUSDT';
         $predictions    = [];
         $data_count     = 0;

@@ -52,13 +52,24 @@ class LabelDataJob implements ShouldQueue
 
                         $change = ($nextDaysPrice - $symbol_price) / $symbol_price;
 
-                        if ($change >= $threshold) {
+                        // label -1 0 1
+                        // if ($change >= $threshold) {
+                        //     $symbol_record->{$label} = 1;
+                        // } else if ($change <= -$threshold) {
+                        //     $symbol_record->{$label} = -1;
+                        // } else {
+                        //     $symbol_record->{$label} = 0;
+                        // }
+
+                        // label 1 -1
+                        if ($nextDaysPrice > $symbol_price) {
                             $symbol_record->{$label} = 1;
-                        } else if ($change <= -$threshold) {
+                        } else if ($nextDaysPrice < $symbol_price) {
                             $symbol_record->{$label} = -1;
-                        } else {
-                            $symbol_record->{$label} = 0;
-                        }
+                        } 
+                        // else {
+                        //     $symbol_record->{$label} = 0;
+                        // }
 
                         echo $symbol_record->{$label} . ' '  . "\n";
                         $symbol_record->save();

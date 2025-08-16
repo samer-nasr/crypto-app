@@ -74,6 +74,10 @@
                             <input type="date"  name="last_date" id="last_date" class="w-full border-gray-300 rounded-lg mt-1" >
                         </div>
 
+                        <div class="mb-4">
+                            <label class="block font-medium text-gray-700">Is Test</label>
+                            <input type="checkbox"  name="is_test"  class="border-gray-300  mt-1" >
+                        </div>
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                             Train Model
                         </button>

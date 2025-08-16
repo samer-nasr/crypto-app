@@ -13,18 +13,17 @@ class ModelTrainController extends Controller
 {
     public function train(Request $request)
     {
-        $is_test    = 1;
+        $is_test    = $request->has('is_test') ? 1 : 0;
         $symbol     = $request->symbol;
         $label_time = $request->label_time;
         $label      = 'label_' . $label_time;
-        $last_date  = Carbon::parse($request->last_date)->format('Y-m-d H:i:s');
+        $last_date  = $request->last_date ? Carbon::parse($request->last_date)->format('Y-m-d H:i:s') : null;
         // dd($last_date);
 
         $query = BinanceData::where('symbol', $symbol)
             ->whereNotNull('percentage_change')
             // ->whereNotNull('label')
             ->whereNotNull($label);
-
 
         if ($last_date) {
             $query = $query->where('open_time', '<=', $last_date);
@@ -111,7 +110,7 @@ class ModelTrainController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
+        
         $response = $this->train($request);
 
         return redirect()->route('models.index')->with('success', 'Model created successfully.');

@@ -22,6 +22,15 @@ class PredictionInput(BaseModel):
     previous_avg_price: float
     previous_price_change: float
     price_range: float
+    ema_5: float
+    ema_10: float
+    ema_20: float
+    ema_50: float
+    sma_5: float
+    sma_10: float
+    sma_20: float
+    sma_50: float
+    rsi_14: float
 
 # Input for training
 class TrainingRecord(BaseModel):
@@ -30,6 +39,15 @@ class TrainingRecord(BaseModel):
     previous_avg_price: float
     previous_price_change: float
     price_range: float
+    ema_5: float
+    ema_10: float
+    ema_20: float
+    ema_50: float
+    sma_5: float
+    sma_10: float
+    sma_20: float
+    sma_50: float
+    rsi_14: float
     label: int  # target
 
 class TrainingData(BaseModel):
@@ -55,7 +73,16 @@ def predict(data: PredictionInput , model_path: str):
         data.percentage_change,
         data.previous_avg_price,
         data.previous_price_change,
-        data.price_range
+        data.price_range,
+        data.ema_5,
+        data.ema_10,
+        data.ema_20,
+        data.ema_50,
+        data.sma_5,
+        data.sma_10,
+        data.sma_20,
+        data.sma_50,
+        data.rsi_14
     ]]
 
     prediction = model.predict(features)[0]

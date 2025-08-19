@@ -22,6 +22,7 @@ class ModelTrainController extends Controller
 
         $query = BinanceData::where('symbol', $symbol)
             ->whereNotNull('percentage_change')
+            ->whereNotNull('ema_50')
             // ->whereNotNull('label')
             ->whereNotNull($label);
 
@@ -35,6 +36,15 @@ class ModelTrainController extends Controller
             'previous_avg_price',
             'previous_price_change',
             'price_range',
+            'ema_20',
+            'ema_5',
+            'ema_10',
+            'ema_50',
+            'sma_5',
+            'sma_10',
+            'sma_20',
+            'sma_50',
+            'rsi_14',
             $label,
             'open_time'
         );

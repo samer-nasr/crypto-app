@@ -27,6 +27,15 @@ class PredictionController extends Controller
                             'previous_avg_price',
                             'previous_price_change',
                             'price_range',
+                            'ema_5',
+                            'ema_10',
+                            'ema_20',
+                            'ema_50',
+                            'sma_5',
+                            'sma_10',
+                            'sma_20',
+                            'sma_50',
+                            'rsi_14',
                         ])
                         ->first()
                         ->toArray();

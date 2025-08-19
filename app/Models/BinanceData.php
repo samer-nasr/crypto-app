@@ -33,5 +33,14 @@ class BinanceData extends Model
         'percentage_change',
         'previous_avg_price',
         'previous_price_change',
+        'sma_5',
+        'sma_10',
+        'sma_20',
+        'sma_50',
+        'ema_5',
+        'ema_10',
+        'ema_20',
+        'ema_50',
+        'rsi_14',
     ];
 }

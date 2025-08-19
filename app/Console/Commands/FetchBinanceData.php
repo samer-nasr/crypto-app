@@ -45,7 +45,7 @@ class FetchBinanceData extends Command
                 if ($last_time) {
                     $startTime = Carbon::parse($last_time->open_time)->addDays(1)->timestamp*1000;
                 }
-                echo "start from " . Carbon::createFromTimestamp($startTime)->toDateTimeString() . "\n";
+                echo "start from " . Carbon::createFromTimestamp($startTime/1000)->toDateTimeString() . "\n";
                 do {
                     // Fetch the prices of Bitcoin and Ethereum in USD
                     $response = Http::get(env('BINANCE_ENDPOINT_PRICE_API'), [

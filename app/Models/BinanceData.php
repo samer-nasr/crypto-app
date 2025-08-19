@@ -42,5 +42,6 @@ class BinanceData extends Model
         'ema_20',
         'ema_50',
         'rsi_14',
+        'note'
     ];
 }

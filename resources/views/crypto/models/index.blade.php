@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12 bg-gray-100 min-h-screen">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-1 gap-6">
 
 
             <div class="bg-white p-6 rounded-xl shadow-md">
@@ -17,6 +17,7 @@
                             <th class="p-2 border-b">Label Time</th>
                             <th class="p-2 border-b">Symbol</th>
                             <th class="p-2 border-b">Last Trained At</th>
+                            <th class="p-2 border-b">Info</th>
                             <th class="p-2 border-b">Action</th>
                         </tr>
                     </thead>
@@ -27,6 +28,36 @@
                             <td class="p-2">{{ $model->label_time }}</td>
                             <td class="p-2">{{ $model->symbol }}</td>
                             <td class="p-2">{{ $model->last_record_time ? \Carbon\Carbon::parse($model->last_record_time)->format('Y-m-d') : 'N/A'}}</td>
+                            <td class="p-2">
+                                <!-- 1: <br>
+                                Prescision: {{ $model->classification_report[1]['precision'] }} -->
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="p-2 border-b">Label</th>
+                                            <th class="p-2 border-b">Precision</th>
+                                            <th class="p-2 border-b">Recall</th>
+                                            <th class="p-2 border-b">F1-score</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="p-2 border-b">1</td>
+                                            <td class="p-2 border-b">{{ $model->classification_report[1]['precision'] }}</td>
+                                            <td class="p-2 border-b">{{ $model->classification_report[1]['recall'] }}</td>
+                                            <td class="p-2 border-b">{{ $model->classification_report[1]['f1-score'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2 border-b">-1</td>
+                                            <td class="p-2 border-b">{{ $model->classification_report[-1]['precision'] }}</td>
+                                            <td class="p-2 border-b">{{ $model->classification_report[-1]['recall'] }}</td>
+                                            <td class="p-2 border-b">{{ $model->classification_report[-1]['f1-score'] }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
                             <td class="p-2">
                                 <form method="POST" action="{{ route('models.destroy', $model->id) }}" class="inline">
                                     @csrf

@@ -47,6 +47,8 @@ class PredictionController extends Controller
 
         $response = Http::post($endpoint, $data);
 
+        // dd($response->json());
+
         $return = $response->json()['prediction'];
         // dd($return);
 

@@ -15,4 +15,21 @@ return [
 
     'models_path' => 'python/model/',
 
+    'features' => [
+        'avg_price',
+        'percentage_change',
+        'previous_avg_price',
+        'previous_price_change',
+        'price_range',
+        'sma_10',
+        'sma_20',
+        'sma_5',
+        'ema_10',
+        'ema_20',
+        'ema_5',
+        'ema_50',
+        'sma_50',
+        'rsi_14',
+    ],
+
 ];

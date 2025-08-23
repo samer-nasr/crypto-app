@@ -19,6 +19,7 @@ class ModelTrain extends Model
         'last_record_time',
         'label_days',
         'is_deleted',
-        'is_test'
+        'is_test',
+        'train_id'
     ];
 }

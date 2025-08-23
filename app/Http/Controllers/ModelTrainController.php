@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BinanceData;
 use App\Models\ModelTrain;
 use App\Models\Symbol;
+use App\Models\Train;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -13,59 +14,46 @@ class ModelTrainController extends Controller
 {
     public function train(Request $request)
     {
+        // dd($request->all());
+        $features   = $request->features;
         $is_test    = $request->has('is_test') ? 1 : 0;
         $symbol     = $request->symbol;
         $label_time = $request->label_time;
         $label      = 'label_' . $label_time;
         $last_date  = $request->last_date ? Carbon::parse($request->last_date)->format('Y-m-d H:i:s') : null;
-        // dd($last_date);
+        // dd($features);
 
         $query = BinanceData::where('symbol', $symbol)
             ->whereNotNull('percentage_change')
             ->whereNotNull('ema_50')
-            // ->whereNotNull('label')
+            // ->where($label , -1)
             ->whereNotNull($label);
 
         if ($last_date) {
             $query = $query->where('open_time', '<=', $last_date);
         }
 
-        $query = $query->select(
-            'avg_price',
-            'percentage_change',
-            'previous_avg_price',
-            'previous_price_change',
-            'price_range',
-            'ema_20',
-            'ema_5',
-            'ema_10',
-            'ema_50',
-            'sma_5',
-            'sma_10',
-            'sma_20',
-            'sma_50',
-            'rsi_14',
-            $label,
-            'open_time'
-        );
+        $select = [];
+        foreach ($features as $feature) {
+            $select[] = $feature;
+        }
+        $select[] = $label;
+        $select[] = 'open_time';
 
-        $records = $query->get(
-            // [
-            //     'avg_price',
-            //     'percentage_change',
-            //     'previous_avg_price',
-            //     'previous_price_change',
-            //     'price_range',
-            //      $label,
-            //     'open_time'
-            // ]
-        )->map(function ($item) use ($label) {
-            $item->label = $item[$label] ?? null;
-            unset($item[$label]);
-            return $item;
-        })->toArray();
+        // dd($select);
 
-        // dd($records);
+        $query = $query->select($select);
+
+        $records = $query
+                    // ->limit(2)
+                    ->get()->map(function ($item) use ($label) 
+                    {
+                        $item->label = $item[$label] ?? null;
+                        unset($item[$label]);
+                        return $item;
+                    })->toArray();
+
+        
         $last_record_time = $query->orderBy('open_time', 'desc')
             ->first()
             ->open_time;
@@ -76,7 +64,7 @@ class ModelTrainController extends Controller
             return $record;
         }, $records);
 
-        // dd($last_record_time,$records);
+        // dd($records);
 
         $endpoint = 'http://127.0.0.1:8001/train?symbol=' . $symbol . '&test=' . $is_test . '';
         // dd($endpoint);
@@ -101,6 +89,7 @@ class ModelTrainController extends Controller
         $modelTrain->classification_report  = $response["classification_report"];
         $modelTrain->confusion_matrix       = $response["confusion_matrix"];
         $modelTrain->is_test                = $is_test;
+        $modelTrain->train_id               = $request->train;
 
         $modelTrain->save();
 
@@ -111,16 +100,23 @@ class ModelTrainController extends Controller
     {
         $models = ModelTrain::where('is_deleted', 0)->get();
         $symbols = Symbol::where('is_deleted', 0)->get();
+        $trains = Train::where('is_deleted', 0)->get();
 
         $label_times = config('constants.label_time');
 
         // dd($label_times);
-        return view('crypto.models.index', compact('models', 'symbols', 'label_times'));
+        return view('crypto.models.index', compact('models', 'symbols', 'label_times', 'trains'));
     }
 
     public function store(Request $request)
     {
-        
+        // dd($request->all());
+        $train = Train::find($request->train);
+        $features = json_decode($train->features);
+
+        $request->merge([
+            'features' => $features
+        ]);
         $response = $this->train($request);
 
         return redirect()->route('models.index')->with('success', 'Model created successfully.');

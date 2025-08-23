@@ -90,6 +90,16 @@
                             </select>
                         </div>
 
+                         <div class="mb-4">
+                            <label class="block font-medium text-gray-700">Select Train</label>
+                            <select name="train" id="train" class="w-full border-gray-300 rounded-lg mt-1">
+                                <option value="">Select Train</option>
+                                @foreach ($trains as $train)
+                                <option value="{{ $train->id }}">{{ $train->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="mb-4">
                             <label class="block font-medium text-gray-700">Select Label Time</label>
                             <select name="label_time" id="label_time" class="w-full border-gray-300 rounded-lg mt-1">

@@ -5,6 +5,7 @@ use App\Http\Controllers\CryptoPriceController;
 use App\Http\Controllers\ModelTrainController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TrainController;
 use App\Jobs\LabelDataJob;
 use App\Models\Symbol;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index'])->name('orders');
     Route::resource('/orders', App\Http\Controllers\OrderController::class);
     Route::resource('/models', App\Http\Controllers\ModelTrainController::class);
+    Route::resource('/trains', App\Http\Controllers\TrainController::class);
 
     Route::get('/update_crypto_data', [
         CryptoDataController::class, 'update_crypto_data'
@@ -29,6 +31,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/predict' , [PredictionController::class, 'predict'])->name('predict');
     Route::get('/train' , [ModelTrainController::class, 'train']);
+
+   
 
     Route::get('/test' , [PredictionController::class, 'test_prediction']);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BinanceData;
+use App\Models\DataLabel;
 use App\Models\ModelTrain;
 use App\Models\Symbol;
 use App\Models\Train;
@@ -21,12 +22,13 @@ class ModelTrainController extends Controller
         $label_time = $request->label_time;
         $label      = 'label_' . $label_time;
         $last_date  = $request->last_date ? Carbon::parse($request->last_date)->format('Y-m-d H:i:s') : null;
-        // dd($features);
+        // dd($last_date);
 
         $query = BinanceData::where('symbol', $symbol)
             ->whereNotNull('percentage_change')
             ->whereNotNull('ema_50')
             // ->where($label , -1)
+            ->where($label , '!=', 0)
             ->whereNotNull($label);
 
         if ($last_date) {
@@ -57,6 +59,7 @@ class ModelTrainController extends Controller
         $last_record_time = $query->orderBy('open_time', 'desc')
             ->first()
             ->open_time;
+        // dd($last_record_time);
 
         $records = array_map(function ($record) {
             unset($record['id']);
@@ -64,7 +67,7 @@ class ModelTrainController extends Controller
             return $record;
         }, $records);
 
-        // dd($records);
+        // dd(count($records));
 
         $endpoint = 'http://127.0.0.1:8001/train?symbol=' . $symbol . '&test=' . $is_test . '';
         // dd($endpoint);
@@ -74,6 +77,10 @@ class ModelTrainController extends Controller
 
         $response = $response->json();
 
+        $threhold = DataLabel::where('symbol', $symbol)
+                                ->orderBy('created_at', 'desc')
+                                ->first()
+                                ->threshold;
         // dd($response);
 
         // save training in mongo
@@ -90,6 +97,7 @@ class ModelTrainController extends Controller
         $modelTrain->confusion_matrix       = $response["confusion_matrix"];
         $modelTrain->is_test                = $is_test;
         $modelTrain->train_id               = $request->train;
+        $modelTrain->threshold              = $threhold;
 
         $modelTrain->save();
 
@@ -98,9 +106,9 @@ class ModelTrainController extends Controller
 
     public function index(Request $request)
     {
-        $models = ModelTrain::where('is_deleted', 0)->get();
-        $symbols = Symbol::where('is_deleted', 0)->get();
-        $trains = Train::where('is_deleted', 0)->get();
+        $models     = ModelTrain::with('train')->where('is_deleted', 0)->get();
+        $symbols    = Symbol::where('is_deleted', 0)->get();
+        $trains     = Train::where('is_deleted', 0)->get();
 
         $label_times = config('constants.label_time');
 

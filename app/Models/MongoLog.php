@@ -10,6 +10,13 @@ class MongoLog extends Model
     protected $collection = 'logs'; // Optional: name of MongoDB collection
 
     protected $fillable = [
-        'event', 'data', 'message', 'trace','new_account','old_account','order_type', 'logged_at'
+        'event',
+        'data',
+        'message',
+        'trace',
+        'new_account',
+        'old_account',
+        'order_type',
+        'logged_at'
     ];
 }

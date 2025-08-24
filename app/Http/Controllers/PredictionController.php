@@ -12,31 +12,29 @@ class PredictionController extends Controller
 {
     public function predict(Request $request)
     {
-        // dd($request->symbol);
+        // dd($request->all());
         $date       = Carbon::parse($request->date)->format('Y-m-d H:i:s') ;
         $symbol     = $request->symbol;
         $model      = ModelTrain::find($request->model_id);
+        // dd($model->toArray());
         $model_path = $model->model_path;
+        $train      = $model->train;
+        $features   = json_decode($train->features); 
+
+        $select = [];
+
+        foreach ($features as $feature) {
+            $select[] = $feature;
+        }
+
         
+
+        // dd(json_encode($features),$features);
+
         $data = BinanceData::where('symbol', $symbol)
                         ->orderBy('id', 'desc')
                         ->where('open_time', '=', $date)
-                        ->get([
-                            'avg_price',
-                            'percentage_change',
-                            'previous_avg_price',
-                            'previous_price_change',
-                            'price_range',
-                            'ema_5',
-                            'ema_10',
-                            'ema_20',
-                            'ema_50',
-                            'sma_5',
-                            'sma_10',
-                            'sma_20',
-                            'sma_50',
-                            'rsi_14',
-                        ])
+                        ->select($select)
                         ->first()
                         ->toArray();
         unset($data['id']);
@@ -45,9 +43,14 @@ class PredictionController extends Controller
 
         $endpoint = 'http://127.0.0.1:8001/predict?model_path=' . $model_path . '';
 
-        $response = Http::post($endpoint, $data);
+        $request = [
+            'record' => $data,
+            'features' => $features
+        ];
 
-        // dd($response->json());
+        $response = Http::post($endpoint, $request);
+
+        return ($response->json());
 
         $return = $response->json()['prediction'];
         // dd($return);

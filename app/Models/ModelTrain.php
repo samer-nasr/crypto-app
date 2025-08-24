@@ -20,6 +20,12 @@ class ModelTrain extends Model
         'label_days',
         'is_deleted',
         'is_test',
-        'train_id'
+        'train_id',
+        'threshold',
     ];
+
+    public function train()
+    {
+        return $this->belongsTo(Train::class);
+    }
 }

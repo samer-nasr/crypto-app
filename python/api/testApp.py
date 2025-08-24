@@ -17,42 +17,11 @@ MODEL_DIR = "../model"
 
 # Input for prediction
 class PredictionInput(BaseModel):
-    avg_price: float
-    percentage_change: float
-    previous_avg_price: float
-    previous_price_change: float
-    price_range: float
-    ema_5: float
-    ema_10: float
-    ema_20: float
-    ema_50: float
-    sma_5: float
-    sma_10: float
-    sma_20: float
-    sma_50: float
-    rsi_14: float
-
-# Input for training
-# class TrainingRecord(BaseModel):
-#     avg_price: float
-#     percentage_change: float
-#     previous_avg_price: float
-#     previous_price_change: float
-#     price_range: float
-#     ema_5: float
-#     ema_10: float
-#     ema_20: float
-#     ema_50: float
-#     sma_5: float
-#     sma_10: float
-#     sma_20: float
-#     sma_50: float
-#     rsi_14: float
-#     label: int  # target
+    record: dict
+    features: List[str]
 
 class TrainingData(BaseModel):
     records: List[dict]
-
 
 @app.post("/predict")
 def predict(data: PredictionInput , model_path: str):
@@ -61,78 +30,10 @@ def predict(data: PredictionInput , model_path: str):
 
     model = joblib.load(model_path)
 
-    # features = [[
-    #     data.avg_price,
-    #     data.percentage_change,
-    #     data.previous_avg_price,
-    #     data.previous_price_change,
-    #     data.price_range,
-    #     data.ema_5,
-    #     data.ema_10,
-    #     data.ema_20,
-    #     data.ema_50,
-    #     data.sma_5,
-    #     data.sma_10,
-    #     data.sma_20,
-    #     data.sma_50,
-    #     data.rsi_14
-    # ]]
-
-    #  # Make sure features are in the same order as training
-    # feature_dict = {
-    #     "avg_price": data.avg_price,
-    #     "percentage_change": data.percentage_change,
-    #     "previous_avg_price": data.previous_avg_price,
-    #     "previous_price_change": data.previous_price_change,
-    #     "price_range": data.price_range,
-    #     "ema_5": data.ema_5,
-    #     "ema_10": data.ema_10,
-    #     "ema_20": data.ema_20,
-    #     "ema_50": data.ema_50,
-    #     "sma_5": data.sma_5,
-    #     "sma_10": data.sma_10,
-    #     "sma_20": data.sma_20,
-    #     "sma_50": data.sma_50,
-    #     "rsi_14": data.rsi_14,
-    # }
-
-    # features_df = pd.DataFrame([features])
-
-      # Define feature columns (same as training order)
-    feature_names = [
-        "avg_price",
-        "percentage_change",
-        "previous_avg_price",
-        "previous_price_change",
-        "price_range",
-        "sma_10",
-        "sma_20",
-        "sma_5",
-        "ema_10",
-        "ema_20",
-        "ema_5",
-        "ema_50",
-        "sma_50",
-        "rsi_14"
-    ]
+    feature_names = data.features
 
     # Create DataFrame with column names
-    features = pd.DataFrame([[
-        data.avg_price,
-        data.percentage_change,
-        data.previous_avg_price,
-        data.previous_price_change,
-        data.price_range,
-        data.sma_10,
-        data.sma_20,
-        data.sma_5,
-        data.ema_10,
-        data.ema_20,
-        data.ema_5,
-        data.ema_50,
-        data.sma_50,
-        data.rsi_14
-    ]], columns=feature_names)
+    features = pd.DataFrame([data.record], columns=feature_names)
 
     prediction = model.predict(features)[0]
      # Probability (confidence for each class)

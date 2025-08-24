@@ -13,7 +13,8 @@
                 <table class="w-full text-left border border-gray-200 text-sm table-auto">
                     <thead class="bg-gray-100 text-gray-700">
                         <tr>
-                            <th class="p-2 border-b">Model Name</th>
+                            <th class="p-2 border-b">Train</th>
+                            <th class="p-2 border-b">Threshold</th>
                             <th class="p-2 border-b">Label Time</th>
                             <th class="p-2 border-b">Symbol</th>
                             <th class="p-2 border-b">Last Trained At</th>
@@ -24,7 +25,8 @@
                     <tbody>
                         @foreach ($models as $model)
                         <tr class="hover:bg-gray-50">
-                            <td class="p-2">{{ $model->model_name}}</td>
+                            <td class="p-2">{{ $model->train->name}}</td>
+                            <td class="p-2">{{ $model->threshold }}</td>
                             <td class="p-2">{{ $model->label_time }}</td>
                             <td class="p-2">{{ $model->symbol }}</td>
                             <td class="p-2">{{ $model->last_record_time ? \Carbon\Carbon::parse($model->last_record_time)->format('Y-m-d') : 'N/A'}}</td>
@@ -147,7 +149,7 @@
                             <select name="model_id" id="symbol" class="w-full border-gray-300 rounded-lg mt-1">
                                 <option value="">Select Model</option>
                                 @foreach ($models as $model)
-                                <option value="{{ $model->id }}">{{ $model->symbol }} | {{ $model->model_name }} | Label:  {{ $model->label_time }}</option>
+                                <option value="{{ $model->id }}">{{ $model->symbol }} | {{ $model->model_name }} | Label:  {{ $model->label_time }} | Train: {{ $model->train->name }}</option>
                                 @endforeach
                             </select>
                         </div>

@@ -24,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/orders', App\Http\Controllers\OrderController::class);
     Route::resource('/models', App\Http\Controllers\ModelTrainController::class);
     Route::resource('/trains', App\Http\Controllers\TrainController::class);
+    Route::resource('/labels', App\Http\Controllers\DataLabelController::class);
 
     Route::get('/update_crypto_data', [
         CryptoDataController::class, 'update_crypto_data'
@@ -35,9 +36,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
    
 
     Route::get('/test' , [PredictionController::class, 'test_prediction']);
+    Route::get('/backtest' , [TrainController::class, 'backtest']);
 
      Route::get('/config' , function () {
-        LabelDataJob::dispatch();
+        LabelDataJob::dispatch(0.010);
+        dd('done');
      });
 
 
